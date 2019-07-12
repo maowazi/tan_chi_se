@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>打字母练习</title>
+    <script src="../../js/tool.js"></script>
+    <script src="../../js/jquery-3.3.1.js"></script>
+    
+</head>
+<body>
+    <script>
+        $(function($){
+            $("html,body").css({width:"100%",height:"100%"});
+            let div;
+            let L,T;
+            let body = document.querySelector("body");
+            let b = $("body").html("<p></p>");
+            $("p").text("正确0个。")
+            $("p").css({width:"200px",height:"20px",position:"absolute",bottom:"0px",right:"100px"});
+            setInterval(function(){
+                let num = getRand(3,6);
+               for (let i = 0; i < num; i++) {
+                   div = document.createElement("div");
+                   $("div").css({width:"50px",
+                        height:"50px",
+                        border:"1px solid #ccc",
+                        textAlign:"center",
+                        lineHeight:"50px",
+                        borderRadius:"50%"
+                    });
+                    L = getRand(0,$(window).width()-50) + "px";
+                    T = getRand(0,200) + "px";
+                    div.style.position = "absolute"
+                    div.style.left = L;
+                    div.style.top = T;
+                    div.innerHTML = String.fromCharCode(getRand(65,90));
+                    body.appendChild(div);  
+               }
+                   $("div").animate({top:$(window).height()-$("div").height()},8000,function(){
+                        $(this).remove()
+                   })
+            },5000)
+
+
+
+
+            let z = 0;
+            let c = 0;
+            document.onkeyup = function(eve){
+                let box = document.querySelectorAll("div");
+                let e = eve || window.event;
+                let code = e.keyCode || e.which || e.charCode;
+                let sum = String.fromCharCode(code);
+                for(let i = 0; i < box.length; i++){
+                    if(box[i].innerText === sum){
+                        //alert(sum)
+                        box[i].remove();
+                        z++;
+                    }else{
+                        c++;
+                    }
+                }
+                $("p").text("正确"+z+"个.")
+            }
+        })    
+    </script>
+</body>
+</html>

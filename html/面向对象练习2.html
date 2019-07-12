@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<script src="../../js/tool.js"></script>
+		<title>面向对象贪吃蛇练习</title>
+		<style type="text/css">
+			body,html{
+				width: 100%;
+				height: 100%;
+				margin: 0;
+				padding: 0;
+			}
+			div{
+				width: 10px;
+				height: 10px;
+				border-radius: 50%;
+				position: absolute;
+			}
+			.her,.food{
+				background: red;
+			}
+			.wei{
+				background: #ccc;
+			}
+		</style>
+<script type="text/javascript">
+	class She{                //定义一个类
+		constructor(){
+			this.body = document.querySelector("body");//获取body
+			this.width = document.documentElement.clientWidth;//获取浏览器宽度
+			this.height = document.documentElement.clientHeight;//获取浏览器高度
+			this.timer= 0;                           //保存定时器
+			this.dir = 0;                            //保存键盘键值
+			this.sin = 1;                            //保存取反的方向
+			this.flag = true;                        //控制开关一停止游戏
+		}
+		header(){//头部和身体
+			let div,flag = document.createDocumentFragment();//声明变量,创建文档碎片
+			for(let i = 0;i<4; i++){                          //创建div
+				div = document.createElement("div");
+				if(i === 0){ 
+					div.className = "her";//让第一个div为红色
+				}else{
+					div.className = "wei";//尾部为灰色
+				}
+				div.style.left = 10*(3-i)+"px";//把div摆成一排
+				flag.appendChild(div);          
+			}
+			this.body.appendChild(flag);
+		}
+		food(){//食物
+			this.div = document.createElement("div");
+			this.div.style.left = parseInt(Math.random()*this.width/10)*10+"px";//给食物一个随机的位置
+			this.div.style.top = parseInt(Math.random()*this.height/10)*10+"px";
+			this.div.className = "food";              //给食物定义类名设置样式
+			this.body.appendChild(this.div);
+		}
+		move(_dir,_sin){                              //移动,第一个参数为方向,第二个是取反的变量,可以随便定义
+			for (var i = this.body.children.length-2; i>0; i--) {//让后面的一个的位置得到前面的位置,从后向前移动,像毛毛虫一样.为防止出现断裂
+				this.body.children[i].style.left = this.body.children[i-1].style.left;
+				this.body.children[i].style.top = this.body.children[i-1].style.top;
+			}
+			if (_dir === 37 || _dir === 39) {//向左和向右时,_sin为正或负
+				this.body.children[0].style.left = this.body.children[0].offsetLeft+(10*_sin)+"px";
+			}else{                                        //否者是向上和向下,_sin同样为正或负
+				//console.log(this.body.children[0].offsetTop)
+				this.body.children[0].style.top = this.body.children[0].offsetTop+(10*_sin)+"px";
+			}
+			this.KO();//检测是否撞墙
+			this.eat();//满足条件就吃
+		}
+		go(){                     //按键走
+			let _this = this;//保存this因为下面不是同类的函数
+			//let dir = 0;
+			document.onkeydown = function(eve){
+				let e = eve || window.event;
+				let code = e.keyCode || e.which || e.charCode;
+				_this.dir = code;             //保存键pan的值
+				//console.log(code)
+				if (_this.flag === true) {    //控制开关
+				switch (code){
+					case 37:
+					_this.sin = -1;
+					//_this.move(37,-1);
+						break;
+					case 38:
+					_this.sin = -1;
+					//_this.move(38,-1);
+						break;
+					case 39:
+					_this.sin = 1;
+					//_this.move(39,1);
+						break;
+					case 40:
+					_this.sin = 1;
+					//_this.move(40,1)
+						break;
+					default:
+						break;
+				}
+				_this.move(_this.dir,_this.sin);//调用走
+				_this.run();                    //调用跑
+				}
+			}
+		}
+		run(){                           //跑
+			let _this = this;             //保存this
+			window.clearInterval(_this.timer);//先清除当前定时器
+			_this.timer = window.setInterval(function(){
+				_this.move(_this.dir,_this.sin)//调用移动,移动调用走  走调用跑
+			},300);
+		}
+		eat(){           //吃
+			if (this.body.children[0].offsetLeft === this.body.children[this.body.children.length-1].offsetLeft && this.body.children[0].offsetTop === this.body.children[this.body.children.length-1].offsetTop) {
+				//this.body.children[this.body.children.length-1].className = "wei";
+				this.food();
+			}
+		}
+		KO(){              //撞墙
+			if (this.body.children[0].offsetLeft < 0 || this.body.children[0].offsetTop < 0 || this.body.children[0].offsetTop > this.height - this.body.children[0].offsetHeight+1 || this.body.children[0].offsetLeft > this.width - this.body.children[0].offsetWidth) {
+				window.clearInterval(this.timer);
+				this.flag = false;
+				alert("你撞墙了!");
+			}
+		}
+	}
+	window.onload = function(){
+		let she = new She();
+		she.header();
+		she.food();
+		she.go();
+	}
+</script>
+	</head>
+	<body>
+	</body>
+</html>

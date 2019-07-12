@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>贪吃蛇练习</title>
+     <script src="../../js/tool.js"></script>
+     <style type="text/css">
+        body{
+            margin: 0;
+            padding: 0;
+        }
+        body,html{
+            height: 100%;
+            width: 100%;
+        }
+        div{
+            width: 10px;
+            height: 10px;
+            position: absolute;
+            border-radius: 50%;
+        }
+        .her,.c{
+            background: red;
+        }
+        .foo{
+            background-color: #ccc;
+        }
+     </style>
+    <script>
+    // 随机一个div,颜色红色,宽高10
+    class She{
+        constructor(){
+            this.body = document.querySelector("body");
+            this.width = document.documentElement.clientWidth || document.body.clientWidth;
+            this.height = document.documentElement.clientHeight || document.body.clientHeight;
+            this.fh = 39;
+            this.timer;
+            this.sin = 1;
+            this.flag = true;
+        }
+        create(){//食物
+            this.div = document.createElement("div");
+            this.div.className = "c";
+            this.div.style.left = parseInt(Math.random()*this.width/10)*10+"px";
+            this.div.style.top = parseInt(Math.random()*this.height/10)*10+"px";
+            this.body.appendChild(this.div);
+        }
+        header(){//蛇
+           let _div,flag = document.createDocumentFragment();
+           for(let i = 0; i < 4; i++){
+               _div = document.createElement("div");
+               if(i === 0){
+                   _div.className = "her";
+               }else{
+                   _div.className = "foo";
+               }
+               _div.style.left = 10*(3-i)+"px";
+               flag.appendChild(_div);
+           }
+           this.body.appendChild(flag);
+        }
+        KO(){
+            let _this = this;
+            if(this.body.children[0].offsetLeft > document.documentElement.clientWidth - this.body.children[0].offsetWidth || this.body.children[0].offsetTop > document.documentElement.clientHeight - this.body.children[0].offsetHeight+1 || this.body.children[0].offsetLeft < 0 || this.body.children[0].offsetTop < 0){
+                //alert(this.body.children[0].offsetTop)
+                //alert(document.documentElement.clientHeight)
+                alert("你撞墙了！");
+                window.clearInterval(_this.timer);
+                this.flag = false;
+                return ;
+            }
+        }
+        move(_arro,sin){                               //键盘控制
+            for(let i = this.body.children.length-2;i>0;i--){
+                this.body.children[i].style.left = this.body.children[i-1].style.left;
+                this.body.children[i].style.top = this.body.children[i-1].style.top;
+            } 
+            if (_arro === 39 || _arro === 37) {
+                this.body.children[0].style.left = this.body.children[0].offsetLeft+(10*sin)+"px";
+            } else {
+                this.body.children[0].style.top = this.body.children[0].offsetTop+(10*sin)+"px";   
+            }
+            this.KO();
+            this.varify();
+        }
+        varify(){                                                       //判断是否吃到
+            if(this.body.children[0].offsetLeft===this.body.children[this.body.children.length-1].offsetLeft && this.body.children[0].offsetTop===this.body.children[this.body.children.length-1].offsetTop){
+                this.body.children[this.body.children.length-1].className="foo";
+                this.create();
+            }
+            
+        }
+        auto(){                                                //自动跑
+            let _this = this;
+            window.clearInterval(_this.timer);
+            _this.timer = window.setInterval(function(){
+                _this.move(_this.fh,_this.sin)
+            },200)
+        }
+        go(){
+            let _this = this;                 //保存this原因是下面的键盘事件的函数和上面的this不是同一个
+            document.onkeydown = function(eve){
+                let e = eve || window.event;
+                let code;
+                //let code = e.keyCode || e.which || e.charCode;
+                if((_this.fh === 37 && code !== 39 || _this.fh === 39 && code !== 37 || _this.fh === 38 && code !== 40 || _this.fh === 40 && code!== 38) && _this.flag === true){
+                    code = e.keyCode || e.which || e.charCode;
+                    console.log(typeof e.key);
+                    console.log(e.keyCode)
+                    _this.fh = code
+                    switch (code) {
+                        case 37:
+                        _this.sin = -1;
+                        //_this.move( "left",-1);
+                        break;
+
+                        case 38:
+                        _this.sin = -1; 
+                        //_this.move( "top",-1);
+                        break;
+
+                        case 39:
+                        _this.sin = 1;
+                        //_this.move( "right",1);
+                        break;
+
+                        case 40:
+                        _this.sin = 1;
+                        //_this.move( "bottom",1);
+                        break;
+                        default:
+                            break;
+                    }
+                    _this.move(_this.fh,_this.sin);
+                    _this.auto();
+                }
+            }  
+        }
+    }
+    window.onload = function(){
+    let _she = new She();
+    _she.header();
+    _she.create();
+    _she.go();
+    _she.varify();
+    _she.KO();
+    }
+    </script>
+</head>
+<body>
+</body>
+</html>
